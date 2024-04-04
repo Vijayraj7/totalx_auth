@@ -1,14 +1,6 @@
 import 'package:totalx_auth/models/user_profile.dart';
 
 class UserService {
-  Future<UserProfile?> getUserByEmail(String email) async {
-    return UserProfile(
-      name: 'John Doe',
-      age: '16',
-      image: 'assets/images/profile.jpg',
-    );
-  }
-
   Future<List<UserProfile>> getUsers() async {
     return [
       UserProfile(
