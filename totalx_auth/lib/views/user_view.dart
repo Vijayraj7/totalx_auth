@@ -9,7 +9,11 @@ class UserView extends StatelessWidget {
   String selectedSortOption = 'All';
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         leading: const Icon(Icons.place, color: Colors.white),
         backgroundColor: Colors.black,
@@ -20,13 +24,14 @@ class UserView extends StatelessWidget {
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.only(left: 10, top: 10, right: 10),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(40),
                         border: Border.all(color: bcolor)),
                     margin: const EdgeInsets.all(10),
@@ -56,9 +61,11 @@ class UserView extends StatelessWidget {
 
                       showModalBottomSheet<void>(
                         context: context,
+                        isScrollControlled: true,
                         builder: (BuildContext contex) {
                           return StatefulBuilder(builder: (_, setter) {
                             return Container(
+                              // height: screenHeight - keyboardHeight - 145,
                               padding: EdgeInsets.all(16),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -70,53 +77,53 @@ class UserView extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16),
                                   )),
-                                  ListTile(
+                                  RadioListTile(
                                     title: Text('All'),
-                                    leading: Radio(
-                                      value: 'All',
-                                      groupValue: selectedSortOption,
-                                      onChanged: (value) {
-                                        setter(() {
-                                          selectedSortOption = value as String;
-                                          contex
-                                              .read<UserService>()
-                                              .sortByAge(selectedSortOption);
-                                        });
-                                        Navigator.pop(contex);
-                                      },
-                                    ),
+                                    // leading: Radio(
+                                    value: 'All',
+                                    groupValue: selectedSortOption,
+                                    onChanged: (value) {
+                                      setter(() {
+                                        selectedSortOption = value as String;
+                                        contex
+                                            .read<UserService>()
+                                            .sortByAge(selectedSortOption);
+                                      });
+                                      Navigator.pop(contex);
+                                    },
+                                    // ),
                                   ),
-                                  ListTile(
+                                  RadioListTile(
                                     title: Text('Age: Elder'),
-                                    leading: Radio(
-                                      value: 'Elder',
-                                      groupValue: selectedSortOption,
-                                      onChanged: (value) {
-                                        setter(() {
-                                          selectedSortOption = value as String;
-                                          contex
-                                              .read<UserService>()
-                                              .sortByAge(selectedSortOption);
-                                        });
-                                        Navigator.pop(contex);
-                                      },
-                                    ),
+                                    // leading: Radio(
+                                    value: 'Elder',
+                                    groupValue: selectedSortOption,
+                                    onChanged: (value) {
+                                      setter(() {
+                                        selectedSortOption = value as String;
+                                        contex
+                                            .read<UserService>()
+                                            .sortByAge(selectedSortOption);
+                                      });
+                                      Navigator.pop(contex);
+                                    },
+                                    // ),
                                   ),
-                                  ListTile(
+                                  RadioListTile(
                                     title: Text('Age: Younger'),
-                                    leading: Radio(
-                                      value: 'Younger',
-                                      groupValue: selectedSortOption,
-                                      onChanged: (value) {
-                                        setter(() {
-                                          selectedSortOption = value as String;
-                                          contex
-                                              .read<UserService>()
-                                              .sortByAge(selectedSortOption);
-                                        });
-                                        Navigator.pop(contex);
-                                      },
-                                    ),
+                                    // leading: Radio(
+                                    value: 'Younger',
+                                    groupValue: selectedSortOption,
+                                    onChanged: (value) {
+                                      setter(() {
+                                        selectedSortOption = value as String;
+                                        contex
+                                            .read<UserService>()
+                                            .sortByAge(selectedSortOption);
+                                      });
+                                      Navigator.pop(contex);
+                                    },
+                                    // ),
                                   ),
                                 ],
                               ),
@@ -135,19 +142,41 @@ class UserView extends StatelessWidget {
               ],
             ),
           ),
+          Container(
+              child: ListTile(
+            title: Text(
+              "Users Lists",
+              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 19),
+            ),
+          )),
           Expanded(
             child: Consumer<UserService>(
               builder: (context, controller, _) {
                 return ListView.builder(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
                   itemCount: controller.users.length,
                   itemBuilder: (context, index) {
                     final UserProfile user = controller.users[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: AssetImage(user.image),
+                    return Card(
+                      color: Colors.white,
+                      child: ListTile(
+                        minVerticalPadding: 25,
+                        tileColor: Colors.transparent,
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundImage: AssetImage(user.image),
+                        ),
+                        title: Text(
+                          user.name,
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          "Age: " + user.age,
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w400),
+                        ),
                       ),
-                      title: Text(user.name),
-                      subtitle: Text(user.age),
                     );
                   },
                 );
@@ -166,47 +195,146 @@ class UserView extends StatelessWidget {
   }
 
   void _showAddUserBottomSheet(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
-      builder: (context) => AddUserBottomSheet(),
+      builder: (contex) =>
+          AddUserBottomSheet(screenHeight - keyboardHeight - 145),
     );
   }
 }
 
 class AddUserBottomSheet extends StatelessWidget {
+  double height;
+  TextEditingController name_cntrl = new TextEditingController();
+  TextEditingController age_cntrl = new TextEditingController();
+  AddUserBottomSheet(this.height);
   @override
   Widget build(BuildContext context) {
     String? name, age, image;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Add User',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          const TextField(
-            decoration: InputDecoration(labelText: 'Name'),
-          ),
-          const SizedBox(height: 8),
-          const TextField(
-            decoration: InputDecoration(labelText: 'Phone Number'),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // ignore: unnecessary_null_comparison
-              if (name != null && age != null && image != null) {
-                Navigator.pop(context);
-                context.read<UserService>().adduser(name, age, image);
-              }
-            },
-            child: const Text('Add'),
-          ),
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        height: height,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            const Text(
+              'Add A New User',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              child: Center(
+                child: Image.asset('assets/selpic.png'),
+              ),
+            ),
+            const SizedBox(height: 8),
+            add_user_textfield(
+              name: "Name",
+              cntrl: name_cntrl,
+            ),
+            const SizedBox(height: 18),
+            add_user_textfield(
+              name: "Age",
+              type: TextInputType.number,
+              cntrl: age_cntrl,
+            ),
+            const SizedBox(height: 36),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // ignore: unnecessary_null_comparison
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ),
+                  SizedBox(width: 15),
+                  ElevatedButton(
+                    onPressed: () {
+                      name = name_cntrl.text;
+                      age = age_cntrl.text;
+                      image = "assets/usr/usr2.png";
+                      // ignore: unnecessary_null_comparison
+                      if (name != null && age != null && image != null) {
+                        Navigator.pop(context);
+                        context
+                            .read<UserService>()
+                            .adduser(name!, age!, image!);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[500],
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 26),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget add_user_textfield(
+      {required TextEditingController cntrl,
+      required String name,
+      TextInputType? type}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.only(left: 15, bottom: 8),
+          child: Text(
+            name,
+            style: TextStyle(
+                fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w400),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey[350]!)),
+          child: TextField(
+            key: ValueKey(name),
+            keyboardType: type,
+            controller: cntrl,
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: name,
+                hintStyle: TextStyle(color: Colors.grey[600]),
+                contentPadding: EdgeInsets.all(7)),
+          ),
+        )
+      ],
     );
   }
 }
