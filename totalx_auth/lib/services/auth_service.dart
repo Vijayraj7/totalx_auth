@@ -1,9 +1,23 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
+import 'package:get_storage/get_storage.dart';
+
 class AuthenticationService {
-  Future<bool> login(String phone, String password) async {
-    return true;
+  login(String phone, String password) {
+    GetStorage().write('phone', phone);
+    // notifyListeners();
   }
 
-  Future<void> logout() async {}
+  bool checklogin() {
+    if (GetStorage().hasData('phone')) {
+      return true;
+    }
+    return false;
+  }
+
+  logout() async {
+    GetStorage().remove('phone');
+    // notifyListeners();
+  }
 }

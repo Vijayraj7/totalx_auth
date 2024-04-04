@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:totalx_auth/controllers/user_controller.dart';
 import 'package:totalx_auth/models/user_profile.dart';
 import 'package:provider/provider.dart';
+import 'package:totalx_auth/services/auth_service.dart';
 
 class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final userController = Provider.of<UserController>(context);
     String phone = "";
 
     return Scaffold(
@@ -14,14 +14,16 @@ class LoginView extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
+            TextFormField(
+              onChanged: (s) {
+                phone = s;
+              },
+              decoration: InputDecoration(hintText: "PhoneNumber"),
+            ),
             ElevatedButton(
               onPressed: () {
-                userController.login(phone, 'password123').then((success) {
-                  if (success) {
-                    // Navigate to the next screen upon successful login
-                    Navigator.pushReplacementNamed(context, '/userList');
-                  } else {}
-                });
+                AuthenticationService().login(phone, "123");
+                Navigator.pushReplacementNamed(context, '/userList');
               },
               child: Text('Login'),
             ),
