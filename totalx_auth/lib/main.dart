@@ -5,6 +5,7 @@ import 'package:totalx_auth/controllers/user_controller.dart';
 import 'package:totalx_auth/services/auth_service.dart';
 import 'package:totalx_auth/services/user_service.dart';
 import 'package:totalx_auth/views/login_view.dart';
+import 'package:totalx_auth/views/otp_view.dart';
 import 'package:totalx_auth/views/user_view.dart';
 
 void main() async {
@@ -29,12 +30,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Login App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: AuthenticationService().checklogin() ? '/userList' : '/',
+      // initialRoute: AuthenticationService().checklogin() ? '/userList' : '/',
+      initialRoute: '/',
       routes: {
         '/': (context) => LoginView(),
+        '/otpview': (context) => OtpView(),
         '/userList': (context) => UserView(),
       },
     );

@@ -5,7 +5,7 @@ import 'package:totalx_auth/models/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:totalx_auth/services/auth_service.dart';
 
-class LoginView extends StatelessWidget {
+class OtpView extends StatelessWidget {
   Color bcolor = const Color.fromARGB(255, 227, 227, 227);
 
   String phone = "";
@@ -25,7 +25,7 @@ class LoginView extends StatelessWidget {
             Container(
               child: Center(
                 child: Image.asset(
-                  'assets/regimg.png',
+                  'assets/otpimg.png',
                   height: 160,
                 ),
               ),
@@ -33,43 +33,73 @@ class LoginView extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            const Text("Enter Phone Number",
+            const Text("OTP Verification",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19)),
             const SizedBox(
               height: 10,
             ),
-            TextFormField(
-              onChanged: (s) {
-                phone = s;
-              },
-              cursorColor: Colors.black,
-              decoration: InputDecoration(
-                hintText: "Enter Phone Number *",
-                hintStyle:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
-                disabledBorder: border,
-                errorBorder: border,
-                focusedBorder: border,
-                focusedErrorBorder: border,
-                enabledBorder: border,
-                border: border,
+            const Text(
+                "Enter the verification code we just sent to your number +91 *******21.",
+                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16)),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: List.generate(
+                6,
+                (index) => Container(
+                  width: 50,
+                  height: 50,
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: TextField(
+                    maxLength: 1,
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    cursorColor: Colors.black,
+                    style: TextStyle(color: Colors.red),
+                    decoration: InputDecoration(
+                      counterText: '',
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (value) {
+                      if (value.length == 1 && index < 5) {
+                        FocusScope.of(context).nextFocus();
+                      } else if (value.isEmpty && index > 0) {
+                        FocusScope.of(context).previousFocus();
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Center(
+              child: const Text(
+                '59 Sec',
+                style:
+                    TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(
               height: 20,
             ),
-            RichText(
-              text: TextSpan(
-                children: [
+            Center(
+              child: RichText(
+                text: TextSpan(children: [
                   const TextSpan(
-                    text: 'By Continuing, I agree to TotalX’s ',
+                    text: "Don't Get Otp? ",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.black,
                     ),
                   ),
                   TextSpan(
-                    text: 'Terms and conditions',
+                    text: 'Resend',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.blue,
@@ -77,23 +107,7 @@ class LoginView extends StatelessWidget {
                     ),
                     recognizer: TapGestureRecognizer()..onTap = () {},
                   ),
-                  const TextSpan(
-                    text: ' & ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                    ),
-                  ),
-                  TextSpan(
-                    text: 'privacy policy',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                    recognizer: TapGestureRecognizer()..onTap = () {},
-                  ),
-                ],
+                ]),
               ),
             ),
             const SizedBox(
@@ -104,12 +118,14 @@ class LoginView extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/otpview');
+                  AuthenticationService().login(phone, "123");
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/userList', (route) => false);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                 ),
-                child: const Text('Get OTP',
+                child: const Text('Verify',
                     style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
             ),
