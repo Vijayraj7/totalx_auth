@@ -56,7 +56,7 @@ class LoginView extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 24,
             ),
             RichText(
               text: TextSpan(
@@ -97,7 +97,7 @@ class LoginView extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 34,
             ),
             SizedBox(
               width: width,

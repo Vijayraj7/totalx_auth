@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:totalx_auth/controllers/user_controller.dart';
 import 'package:totalx_auth/models/user_profile.dart';
@@ -9,27 +13,31 @@ class UserView extends StatelessWidget {
   String selectedSortOption = 'All';
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        leading: const Icon(Icons.place, color: Colors.white),
+        // leading: const Icon(Icons.place, color: Colors.white),
         backgroundColor: Colors.black,
-        leadingWidth: 10,
-        title: const Text('Nilambur',
-            style: TextStyle(color: Colors.white, fontSize: 18)),
+        // leadingWidth: 10,
+        title: Row(
+          children: [
+            Icon(Icons.place, color: Colors.white),
+            Text('Nilambur',
+                style: TextStyle(color: Colors.white, fontSize: 18)),
+          ],
+        ),
       ),
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 10, top: 10, right: 10),
+            margin: const EdgeInsets.only(left: 0, top: 10, right: 10),
+            // margin: const EdgeInsets.all(10),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(40),
@@ -61,10 +69,16 @@ class UserView extends StatelessWidget {
 
                       showModalBottomSheet<void>(
                         context: context,
-                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        // isScrollControlled: true,
                         builder: (BuildContext contex) {
                           return StatefulBuilder(builder: (_, setter) {
                             return Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15),
+                                      topRight: Radius.circular(15))),
                               // height: screenHeight - keyboardHeight - 145,
                               padding: EdgeInsets.all(16),
                               child: Column(
@@ -153,23 +167,30 @@ class UserView extends StatelessWidget {
             child: Consumer<UserService>(
               builder: (context, controller, _) {
                 return ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  padding: EdgeInsets.only(left: 10, right: 10, bottom: 160),
                   itemCount: controller.users.length,
                   itemBuilder: (context, index) {
                     final UserProfile user = controller.users[index];
                     return Card(
+                      // shadowColor: Colors.white,
+                      // surfaceTintColor: Colors.white,
                       color: Colors.white,
                       child: ListTile(
                         minVerticalPadding: 25,
                         tileColor: Colors.transparent,
-                        leading: CircleAvatar(
-                          radius: 30,
-                          backgroundImage: AssetImage(user.image),
-                        ),
+                        leading: user.image.startsWith("/data")
+                            ? CircleAvatar(
+                                radius: 30,
+                                backgroundImage: FileImage(File(user.image)),
+                              )
+                            : CircleAvatar(
+                                radius: 30,
+                                backgroundImage: AssetImage(user.image),
+                              ),
                         title: Text(
                           user.name,
                           style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
+                              fontSize: 14, fontWeight: FontWeight.w500),
                         ),
                         subtitle: Text(
                           "Age: " + user.age,
@@ -185,19 +206,27 @@ class UserView extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        shape: CircleBorder(),
         onPressed: () {
           _showAddUserBottomSheet(context);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }
 
   void _showAddUserBottomSheet(BuildContext context) {
+    saved = false;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       isScrollControlled: true,
       context: context,
       builder: (contex) =>
@@ -206,17 +235,24 @@ class UserView extends StatelessWidget {
   }
 }
 
+String name = "";
+String age = "";
+String image = "";
+bool saved = true;
+
 class AddUserBottomSheet extends StatelessWidget {
   double height;
-  TextEditingController name_cntrl = new TextEditingController();
-  TextEditingController age_cntrl = new TextEditingController();
   AddUserBottomSheet(this.height);
+
   @override
   Widget build(BuildContext context) {
-    String? name, age, image;
     return SingleChildScrollView(
       child: Container(
         height: height,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15), topRight: Radius.circular(15))),
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,21 +264,48 @@ class AddUserBottomSheet extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Container(
-              child: Center(
-                child: Image.asset('assets/selpic.png'),
-              ),
-            ),
+            StatefulBuilder(builder: (_, setter) {
+              return GestureDetector(
+                onTap: () async {
+                  final picker = ImagePicker();
+                  final pickedFile =
+                      await picker.pickImage(source: ImageSource.gallery);
+
+                  if (pickedFile != null) {
+                    // File location of the picked image
+                    String imagePath = pickedFile.path;
+                    setter(() {
+                      image = imagePath;
+                    });
+                    // print('Image location: $imagePath');
+                  } else {
+                    // print('No image selected.');
+                  }
+                },
+                child: Center(
+                  child: image.isEmpty
+                      ? Image.asset('assets/selpic.png')
+                      : CircleAvatar(
+                          backgroundImage: FileImage(File(image)),
+                          radius: 50,
+                        ),
+                ),
+              );
+            }),
             const SizedBox(height: 8),
             add_user_textfield(
               name: "Name",
-              cntrl: name_cntrl,
+              onChanged: (s) {
+                name = s;
+              },
             ),
             const SizedBox(height: 18),
             add_user_textfield(
               name: "Age",
+              onChanged: (s) {
+                age = s;
+              },
               type: TextInputType.number,
-              cntrl: age_cntrl,
             ),
             const SizedBox(height: 36),
             Align(
@@ -270,15 +333,19 @@ class AddUserBottomSheet extends StatelessWidget {
                   SizedBox(width: 15),
                   ElevatedButton(
                     onPressed: () {
-                      name = name_cntrl.text;
-                      age = age_cntrl.text;
-                      image = "assets/usr/usr2.png";
+                      // image = "assets/usr/usr2.png";
                       // ignore: unnecessary_null_comparison
-                      if (name != null && age != null && image != null) {
+                      if (name.isNotEmpty &&
+                          age.isNotEmpty &&
+                          image.isNotEmpty) {
                         Navigator.pop(context);
-                        context
-                            .read<UserService>()
-                            .adduser(name!, age!, image!);
+                        if (saved == false) {
+                          context.read<UserService>().adduser(name, age, image);
+                          name = "";
+                          age = "";
+                          image = "";
+                          saved = true;
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -304,7 +371,7 @@ class AddUserBottomSheet extends StatelessWidget {
   }
 
   Widget add_user_textfield(
-      {required TextEditingController cntrl,
+      {required void Function(String)? onChanged,
       required String name,
       TextInputType? type}) {
     return Column(
@@ -315,7 +382,9 @@ class AddUserBottomSheet extends StatelessWidget {
           child: Text(
             name,
             style: TextStyle(
-                fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w400),
+                color: Colors.grey[600],
+                fontSize: 13,
+                fontWeight: FontWeight.w400),
           ),
         ),
         Container(
@@ -324,13 +393,16 @@ class AddUserBottomSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.grey[350]!)),
           child: TextField(
-            key: ValueKey(name),
             keyboardType: type,
-            controller: cntrl,
+            // controller: cntrl,
+            onChanged: onChanged,
             decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: name,
-                hintStyle: TextStyle(color: Colors.grey[600]),
+                hintStyle: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w400),
                 contentPadding: EdgeInsets.all(7)),
           ),
         )

@@ -43,13 +43,16 @@ class UserService with ChangeNotifier {
   List<UserProfile> users = allusers;
 
   void searchuser(String s) {
-    users = allusers.where((e) => e.name.contains(s)).toList();
+    users = allusers
+        .where((e) => e.name.toLowerCase().contains(s.toLowerCase()))
+        .toList();
     notifyListeners();
   }
 
   void adduser(String name, String age, String image) {
-    users.add(UserProfile(name: name, age: age, image: image));
+    // users.add(UserProfile(name: name, age: age, image: image));
     allusers.add(UserProfile(name: name, age: age, image: image));
+    users = allusers;
     notifyListeners();
   }
 

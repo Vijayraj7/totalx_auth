@@ -111,7 +111,7 @@ class OtpView extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 30,
             ),
             SizedBox(
               width: width,
