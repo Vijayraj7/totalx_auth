@@ -37,6 +37,12 @@ dependencies:
   provider: ^6.1.2
   get_storage: ^2.1.1
   image_picker: ^1.0.7
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.17.8
+  cloud_firestore: ^4.15.8
+  firebase_storage: ^11.6.9
+  keystore_generator: ^1.0.1
+  fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:

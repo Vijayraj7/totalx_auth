@@ -4,6 +4,7 @@ import 'package:totalx_auth/controllers/user_controller.dart';
 import 'package:totalx_auth/models/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:totalx_auth/services/auth_service.dart';
+import 'package:totalx_auth/views/otp_view.dart';
 
 class LoginView extends StatelessWidget {
   Color bcolor = const Color.fromARGB(255, 227, 227, 227);
@@ -104,7 +105,16 @@ class LoginView extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/otpview');
+                  String phoneNumber = phone.trim();
+                  if (phoneNumber.isNotEmpty) {
+                    publicphone = phoneNumber;
+                    Provider.of<AuthenticationService>(context, listen: false)
+                        .sendOTP(phoneNumber);
+                    Navigator.pushNamed(context, '/otpview');
+                  } else {
+                    // Show error message or handle empty phone number
+                  }
+                  // Navigator.pushNamed(context, '/otpview');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,

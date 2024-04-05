@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:totalx_auth/controllers/user_controller.dart';
@@ -5,10 +7,29 @@ import 'package:totalx_auth/models/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:totalx_auth/services/auth_service.dart';
 
-class OtpView extends StatelessWidget {
-  Color bcolor = const Color.fromARGB(255, 227, 227, 227);
+String publicphone = "";
 
-  String phone = "";
+class OtpView extends StatelessWidget {
+  // String phone;
+
+  // OtpView({required this.phone});
+  Color bcolor = const Color.fromARGB(255, 227, 227, 227);
+  List<String> otpDigits = List.generate(6, (index) => '');
+  Stream<int> countdownStream() {
+    StreamController<int> controller = StreamController<int>();
+    int secondsRemaining = 59;
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      if (secondsRemaining > 0) {
+        controller.add(secondsRemaining);
+        secondsRemaining--;
+      } else {
+        timer.cancel();
+        controller.close();
+      }
+    });
+    return controller.stream;
+  }
+
   @override
   Widget build(BuildContext context) {
     InputBorder border =
@@ -38,8 +59,11 @@ class OtpView extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            const Text(
-                "Enter the verification code we just sent to your number +91 *******21.",
+            Text(
+                "Enter the verification code we just sent to your number +91 *******" +
+                    publicphone[publicphone.length - 2] +
+                    publicphone[publicphone.length - 1] +
+                    ".",
                 style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16)),
             const SizedBox(
               height: 20,
@@ -65,9 +89,18 @@ class OtpView extends StatelessWidget {
                       border: InputBorder.none,
                     ),
                     onChanged: (value) {
-                      if (value.length == 1 && index < 5) {
-                        FocusScope.of(context).nextFocus();
+                      // if (value.length == 1 && index < 5) {
+                      //   FocusScope.of(context).nextFocus();
+                      // } else if (value.isEmpty && index > 0) {
+                      //   FocusScope.of(context).previousFocus();
+                      // }
+                      if (value.length == 1) {
+                        otpDigits[index] = value;
+                        if (index < 5) {
+                          FocusScope.of(context).nextFocus();
+                        }
                       } else if (value.isEmpty && index > 0) {
+                        otpDigits[index] = '';
                         FocusScope.of(context).previousFocus();
                       }
                     },
@@ -78,12 +111,33 @@ class OtpView extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            Center(
-              child: const Text(
-                '59 Sec',
-                style:
-                    TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
-              ),
+            StreamBuilder<int>(
+              stream: countdownStream(),
+              builder: (context, snapshot) {
+                // if (snapshot.hasData) {
+                return Center(
+                  child: Text(
+                    '${snapshot.data} Sec',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+                // } else if (snapshot.hasError) {
+                //   return Center(
+                //     child: Text(
+                //       'Error: ${snapshot.error}',
+                //       style: TextStyle(
+                //         color: Colors.red,
+                //         fontWeight: FontWeight.w600,
+                //       ),
+                //     ),
+                //   );
+                // } else {
+                //   return CircularProgressIndicator(); // Loading indicator while waiting for countdown to start
+                // }
+              },
             ),
             const SizedBox(
               height: 20,
@@ -105,7 +159,12 @@ class OtpView extends StatelessWidget {
                       color: Colors.blue,
                       decoration: TextDecoration.underline,
                     ),
-                    recognizer: TapGestureRecognizer()..onTap = () {},
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Provider.of<AuthenticationService>(context,
+                                listen: false)
+                            .resendOTP(publicphone);
+                      },
                   ),
                 ]),
               ),
@@ -117,10 +176,23 @@ class OtpView extends StatelessWidget {
               width: width,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  AuthenticationService().login(phone, "123");
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, '/userList', (route) => false);
+                onPressed: () async {
+                  // AuthenticationService().login(phone, "123");
+                  // Navigator.pushNamedAndRemoveUntil(
+                  //     context, '/userList', (route) => false);
+                  String otp = otpDigits.join().trim();
+                  String verificationId =
+                      ''; // Get the verification ID from previous screen or storage
+                  if (otp.isNotEmpty) {
+                    await Provider.of<AuthenticationService>(context,
+                            listen: false)
+                        .verifyOTP(otp, () {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/userList', (route) => false);
+                    });
+                  } else {
+                    // Show error message or handle empty OTP
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "168819060362",
+    "project_id": "totalxlogin",
+    "storage_bucket": "totalxlogin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168819060362:android:43637bfeb5c0538f250773",
+        "android_client_info": {
+          "package_name": "com.example.totalx_auth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbZdkfoR2e6E5HcQQWw62gVGgEWSKqkgU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

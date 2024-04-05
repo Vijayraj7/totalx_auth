@@ -19,7 +19,7 @@ class UserView extends StatelessWidget {
       appBar: AppBar(
         // leading: const Icon(Icons.place, color: Colors.white),
         backgroundColor: Colors.black,
-        // leadingWidth: 10,
+        leadingWidth: 10,
         title: Row(
           children: [
             Icon(Icons.place, color: Colors.white),
@@ -178,15 +178,21 @@ class UserView extends StatelessWidget {
                       child: ListTile(
                         minVerticalPadding: 25,
                         tileColor: Colors.transparent,
-                        leading: user.image.startsWith("/data")
+                        leading: user.image.startsWith("http")
                             ? CircleAvatar(
                                 radius: 30,
-                                backgroundImage: FileImage(File(user.image)),
+                                backgroundImage: NetworkImage(user.image),
                               )
-                            : CircleAvatar(
-                                radius: 30,
-                                backgroundImage: AssetImage(user.image),
-                              ),
+                            : user.image.startsWith("/data")
+                                ? CircleAvatar(
+                                    radius: 30,
+                                    backgroundImage:
+                                        FileImage(File(user.image)),
+                                  )
+                                : CircleAvatar(
+                                    radius: 30,
+                                    backgroundImage: AssetImage(user.image),
+                                  ),
                         title: Text(
                           user.name,
                           style: TextStyle(
