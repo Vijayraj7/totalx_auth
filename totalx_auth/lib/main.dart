@@ -34,8 +34,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // initialRoute: AuthenticationService().checklogin() ? '/userList' : '/',
-      initialRoute: '/',
+      initialRoute: AuthenticationService().checklogin() ? '/userList' : '/',
+      // initialRoute: '/',
       routes: {
         '/': (context) => LoginView(),
         '/otpview': (context) => OtpView(),
